@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import {
   Inbox,
   CalendarCheck,
@@ -328,7 +328,7 @@ function ScreenDiscover({ addToast }) {
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
-        Karthik taps the link in Empathia's Instagram bio — this is the first thing he sees.
+        Arjun taps the link in Empathia's Instagram bio — this is the first thing he sees.
       </p>
       <div className="rounded-2xl p-8 text-center" style={{ background: c.surfaceSoft, border: `1px solid ${c.line}` }}>
         <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: c.sageSoft }}>
@@ -367,7 +367,7 @@ function ScreenChooseTime() {
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
-        Karthik picks his own slot from real availability — nothing is assigned to him.
+        Arjun picks his own slot from real availability — nothing is assigned to him.
       </p>
       <p className="text-xs uppercase tracking-wide font-semibold mb-3" style={{ color: c.inkFaint }}>
         Initial Longevity Consultation · 60 min
@@ -429,7 +429,7 @@ function ScreenIntake({ addToast }) {
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
         Sent right after payment, and nudged again before the visit if left incomplete.
-        Everything Karthik enters here becomes part of his own pre-visit brief.
+        Everything Arjun enters here becomes part of his own pre-visit brief.
       </p>
       <div className="rounded-2xl p-5 max-w-md" style={{ background: c.surfaceSoft, border: `1px solid ${c.line}` }}>
         <div className="flex items-center justify-between mb-4">
@@ -503,6 +503,32 @@ export default function PatientJourneyMockup() {
     }, 2200);
   };
 
+  /* ---------- Sliding pill measurement ---------- */
+  const containerRef = useRef(null);
+  const clinicRef = useRef(null);
+  const patientRef = useRef(null);
+  const [pillStyle, setPillStyle] = useState({ width: 0, left: 0 });
+
+  useLayoutEffect(() => {
+    const update = () => {
+      const container = containerRef.current;
+      const activeRef = mode === "clinic" ? clinicRef : patientRef;
+      if (!container || !activeRef.current) return;
+
+      const cRect = container.getBoundingClientRect();
+      const bRect = activeRef.current.getBoundingClientRect();
+
+      setPillStyle({
+        width: bRect.width,
+        left: bRect.left - cRect.left,
+      });
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [mode]);
+
   return (
     <div style={{ background: c.bg, minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
       <style>{`
@@ -539,25 +565,31 @@ export default function PatientJourneyMockup() {
           patient experiences on their own phone, from first tap to a completed intake form.
         </p>
 
-        {/* Mode toggle with sliding pill */}
-        <div className="relative inline-flex mb-8 rounded-full p-1" style={{ background: c.surfaceSoft, border: `1px solid ${c.line}` }}>
+        {/* Mode toggle with measured sliding pill */}
+        <div ref={containerRef} className="relative inline-flex mb-8 rounded-full p-1.5" style={{ background: c.surfaceSoft, border: `1px solid ${c.line}` }}>
           <div
-            className="absolute top-1 bottom-1 rounded-full transition-all duration-300 ease-in-out"
+            className="absolute top-1.5 bottom-1.5 rounded-full transition-all duration-300 ease-in-out"
             style={{
               background: c.sage,
-              width: "calc(50% - 4px)",
-              left: mode === "clinic" ? "4px" : "calc(50%)",
+              width: pillStyle.width,
+              left: pillStyle.left,
             }}
           />
-          <button onClick={() => setMode("clinic")}
-            className="relative z-10 text-sm font-semibold px-4 py-2 rounded-full whitespace-nowrap"
-            style={{ color: mode === "clinic" ? c.surface : c.inkSoft }}>
+          <button
+            ref={clinicRef}
+            onClick={() => setMode("clinic")}
+            className="relative z-10 text-sm font-semibold px-5 py-2.5 rounded-full whitespace-nowrap"
+            style={{ color: mode === "clinic" ? c.surface : c.inkSoft }}
+          >
             Clinic view
           </button>
-          <button onClick={() => setMode("patient")}
-            className="relative z-10 text-sm font-semibold px-4 py-2 rounded-full whitespace-nowrap"
-            style={{ color: mode === "patient" ? c.surface : c.inkSoft }}>
-            Patient view (Karthik, new patient)
+          <button
+            ref={patientRef}
+            onClick={() => setMode("patient")}
+            className="relative z-10 text-sm font-semibold px-5 py-2.5 rounded-full whitespace-nowrap"
+            style={{ color: mode === "patient" ? c.surface : c.inkSoft }}
+          >
+            Patient view (Arjun, new patient)
           </button>
         </div>
 
