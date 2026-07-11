@@ -354,7 +354,7 @@ function ScreenDiscover({ addToast }) {
   );
 }
 
-function ScreenChooseTime() {
+function ScreenChooseTime({ addToast }) {
   const slots = [
     { day: "Wed", date: "9 Jul", time: "3:00 PM" },
     { day: "Thu", date: "10 Jul", time: "11:00 AM" },
@@ -385,13 +385,12 @@ function ScreenChooseTime() {
           </button>
         ))}
       </div>
-      <button className="text-sm font-semibold px-5 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
+      <button onClick={() => addToast(`Slot confirmed: ${selected.day}, ${selected.time}`)} className="text-sm font-semibold px-5 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
         Continue with {selected.day}, {selected.time}
       </button>
     </div>
   );
 }
-
 function ScreenPay({ addToast }) {
   return (
     <div>
