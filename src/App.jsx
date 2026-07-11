@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Inbox,
   CalendarCheck,
@@ -115,7 +115,7 @@ function Stepper({ stages, active, setActive }) {
 
 /* ---------- CLINIC VIEW SCREENS ---------- */
 
-function ScreenInbox() {
+function ScreenInbox({ addToast }) {
   const leads = [
     { name: "Ananya Reddy", kind: "Instagram", note: "Saw your reel on insulin resistance — do you take new patients?", time: "2 min ago", status: "new" },
     { name: "Karthik Rao", kind: "Website", note: "Enquiry form: interested in longevity assessment package", time: "18 min ago", status: "booked" },
@@ -140,8 +140,8 @@ function ScreenInbox() {
             <p className="text-sm" style={{ color: c.inkSoft }}>{l.note}</p>
           </div>
           {l.status === "action" && (
-            <button className="shrink-0 text-xs font-semibold px-3 py-2 rounded-full whitespace-nowrap" style={{ background: c.sage, color: c.surface }}>
-              Confirm &amp; schedule
+            <button onClick={() => addToast(`${l.name} scheduled successfully`)} className="shrink-0 text-xs font-semibold px-3 py-2 rounded-full whitespace-nowrap" style={{ background: c.sage, color: c.surface }}>
+              Confirm and schedule
             </button>
           )}
           {l.status === "booked" && (
@@ -150,7 +150,7 @@ function ScreenInbox() {
             </span>
           )}
           {l.status === "new" && (
-            <button className="shrink-0 text-xs font-medium px-3 py-2 rounded-full whitespace-nowrap" style={{ background: "transparent", color: c.inkSoft, border: `1px solid ${c.line}` }}>
+            <button onClick={() => addToast(`Booking link sent to ${l.name}`)} className="shrink-0 text-xs font-medium px-3 py-2 rounded-full whitespace-nowrap" style={{ background: "transparent", color: c.inkSoft, border: `1px solid ${c.line}` }}>
               Send booking link
             </button>
           )}
@@ -162,7 +162,7 @@ function ScreenInbox() {
 
 function ScreenSchedule() {
   const days = ["MON", "TUE", "WED", "THU", "FRI"];
-  const times = ["10:00", "11:00", "12:00", "2:00", "3:00", "4:30", "5:30"];
+  const times = ["10:00 AM", "11:00 AM", "12:00 PM", "2:00 PM", "3:00 PM", "4:30 PM", "5:30 PM"];
   return (
     <div className="flex flex-col md:flex-row gap-5">
       <div className="flex-1">
@@ -178,8 +178,8 @@ function ScreenSchedule() {
             {days.map((d, di) => (
               <div key={d} className="flex flex-col gap-1 p-1.5" style={{ borderRight: di < 4 ? `1px solid ${c.line}` : "none" }}>
                 {times.map((t) => {
-                  const isPriya = d === "TUE" && t === "4:30";
-                  const isKarthik = d === "THU" && t === "11:00";
+                  const isPriya = d === "TUE" && t === "4:30 PM";
+                  const isKarthik = d === "THU" && t === "11:00 AM";
                   return (
                     <div key={t} className="text-[11px] rounded-md py-1.5 text-center"
                       style={
@@ -197,7 +197,7 @@ function ScreenSchedule() {
         </div>
         <div className="flex gap-4 mt-3 text-xs" style={{ color: c.inkSoft }}>
           <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: c.sage }} /> Clinic-confirmed (follow-up)</span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: c.gold }} /> Self-booked & paid (new patient)</span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: c.gold }} /> Self-booked and paid (new patient)</span>
         </div>
       </div>
       <div className="md:w-64 shrink-0">
@@ -249,13 +249,26 @@ function ScreenReminders() {
       </div>
       <div className="md:w-72 shrink-0">
         <div className="rounded-2xl p-4" style={{ background: "#EAF1E4", border: `1px solid ${c.sageLine}` }}>
-          <p className="text-xs font-semibold mb-2" style={{ color: c.sage }}>WhatsApp preview</p>
-          <div className="rounded-xl p-3 text-sm" style={{ background: c.surface, color: c.ink }}>
-            Hi Priya, looking forward to seeing you Tue at 4:30 PM at Empathia.
-            Two quick sections left in your intake form — takes about 3 minutes:
-            [link]. See you soon 🌿
+          <p className="text-xs font-semibold mb-3" style={{ color: c.sage }}>WhatsApp preview</p>
+          <div className="rounded-xl p-3 space-y-3" style={{ background: c.surface }}>
+            <div className="flex items-center gap-2 pb-2" style={{ borderBottom: `1px solid ${c.line}` }}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: c.sage }}>E</div>
+              <div>
+                <p className="text-xs font-semibold" style={{ color: c.ink }}>Empathia Clinic</p>
+                <p className="text-[10px]" style={{ color: c.inkFaint }}>online</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <div className="relative max-w-[90%] rounded-2xl rounded-tr-sm p-3 text-sm" style={{ background: "#DCF8C6", color: c.ink }}>
+                <p>Hi Priya, looking forward to seeing you Tue at 4:30 PM at Empathia. Two quick sections left in your intake form — takes about 3 minutes: [link]. See you soon 🌿</p>
+                <div className="flex items-center justify-end gap-1 mt-1">
+                  <span className="text-[10px]" style={{ color: c.inkFaint }}>4:02 PM</span>
+                  <Check size={12} strokeWidth={3} style={{ color: c.sage }} />
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-xs mt-2" style={{ color: c.inkFaint }}>Sent automatically · read 6 min later</p>
+          <p className="text-xs mt-3 text-center" style={{ color: c.inkFaint }}>Sent automatically · read 6 min later</p>
         </div>
       </div>
     </div>
@@ -311,7 +324,7 @@ function ScreenBrief() {
 
 /* ---------- PATIENT VIEW SCREENS (Karthik Rao, new patient) ---------- */
 
-function ScreenDiscover() {
+function ScreenDiscover({ addToast }) {
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
@@ -333,7 +346,7 @@ function ScreenDiscover() {
           <span style={{ color: c.ink }}>✓ Led by Dr. Sudeepta Rao, MD, FMCP-M</span>
           <span style={{ color: c.ink }}>✓ 60-minute unhurried first consultation</span>
         </div>
-        <button className="text-sm font-semibold px-5 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
+        <button onClick={() => addToast("Opening booking calendar...")} className="text-sm font-semibold px-5 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
           Book a consultation
         </button>
       </div>
@@ -344,10 +357,13 @@ function ScreenDiscover() {
 function ScreenChooseTime() {
   const slots = [
     { day: "Wed", date: "9 Jul", time: "3:00 PM" },
-    { day: "Thu", date: "10 Jul", time: "11:00 AM", selected: true },
+    { day: "Thu", date: "10 Jul", time: "11:00 AM" },
     { day: "Thu", date: "10 Jul", time: "5:30 PM" },
     { day: "Fri", date: "11 Jul", time: "10:00 AM" },
   ];
+  const [selectedSlot, setSelectedSlot] = useState(1);
+  const selected = slots[selectedSlot];
+
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
@@ -358,11 +374,11 @@ function ScreenChooseTime() {
       </p>
       <div className="grid grid-cols-2 gap-2.5 mb-5">
         {slots.map((s, i) => (
-          <button key={i} className="rounded-xl p-3 text-left"
+          <button key={i} onClick={() => setSelectedSlot(i)} className="rounded-xl p-3 text-left"
             style={{
-              background: s.selected ? c.sage : c.surfaceSoft,
-              border: `1.5px solid ${s.selected ? c.sage : c.line}`,
-              color: s.selected ? c.surface : c.ink,
+              background: i === selectedSlot ? c.sage : c.surfaceSoft,
+              border: `1.5px solid ${i === selectedSlot ? c.sage : c.line}`,
+              color: i === selectedSlot ? c.surface : c.ink,
             }}>
             <p className="text-xs font-semibold" style={{ opacity: 0.85 }}>{s.day}, {s.date}</p>
             <p className="text-sm font-semibold">{s.time}</p>
@@ -370,13 +386,13 @@ function ScreenChooseTime() {
         ))}
       </div>
       <button className="text-sm font-semibold px-5 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
-        Continue with Thu, 11:00 AM
+        Continue with {selected.day}, {selected.time}
       </button>
     </div>
   );
 }
 
-function ScreenPay() {
+function ScreenPay({ addToast }) {
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
@@ -393,7 +409,7 @@ function ScreenPay() {
         <div className="flex justify-between text-sm mb-4 pb-4" style={{ color: c.inkFaint, borderBottom: `1px solid ${c.line}` }}>
           <span>Balance at visit</span><span>₹1,500</span>
         </div>
-        <button className="w-full flex items-center justify-center gap-2 text-sm font-semibold px-4 py-3 rounded-full mb-3" style={{ background: c.sage, color: c.surface }}>
+        <button onClick={() => addToast("Processing ₹2,000 payment...")} className="w-full flex items-center justify-center gap-2 text-sm font-semibold px-4 py-3 rounded-full mb-3" style={{ background: c.sage, color: c.surface }}>
           <CreditCard size={15} /> Pay ₹2,000 to confirm
         </button>
         <div className="flex items-center gap-1.5 text-xs justify-center" style={{ color: c.inkFaint }}>
@@ -404,7 +420,11 @@ function ScreenPay() {
   );
 }
 
-function ScreenIntake() {
+function ScreenIntake({ addToast }) {
+  const [complaint, setComplaint] = useState("Ongoing fatigue, family history of diabetes, want a preventive plan...");
+  const [meds, setMeds] = useState("Metformin 500mg, Vitamin D3 weekly");
+  const [sleep, setSleep] = useState(1);
+
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: c.inkSoft }}>
@@ -422,30 +442,39 @@ function ScreenIntake() {
         <div className="flex flex-col gap-4 text-sm">
           <label className="flex flex-col gap-1.5">
             <span style={{ color: c.ink }}>What brings you to Empathia today?</span>
-            <span className="rounded-lg p-2.5" style={{ background: c.surface, border: `1px solid ${c.line}`, color: c.inkFaint }}>
-              Ongoing fatigue, family history of diabetes, want a preventive plan...
-            </span>
+            <textarea
+              value={complaint}
+              onChange={(e) => setComplaint(e.target.value)}
+              className="rounded-lg p-2.5 w-full text-sm bg-transparent resize-none outline-none focus:ring-2 focus:ring-offset-1"
+              style={{ background: c.surface, border: `1px solid ${c.line}`, color: c.ink, fontFamily: "inherit" }}
+              rows={2}
+            />
           </label>
           <label className="flex flex-col gap-1.5">
             <span style={{ color: c.ink }}>Current medications or supplements</span>
-            <span className="rounded-lg p-2.5" style={{ background: c.surface, border: `1px solid ${c.line}`, color: c.inkFaint }}>
-              Metformin 500mg, Vitamin D3 weekly
-            </span>
+            <textarea
+              value={meds}
+              onChange={(e) => setMeds(e.target.value)}
+              className="rounded-lg p-2.5 w-full text-sm bg-transparent resize-none outline-none focus:ring-2 focus:ring-offset-1"
+              style={{ background: c.surface, border: `1px solid ${c.line}`, color: c.ink, fontFamily: "inherit" }}
+              rows={2}
+            />
           </label>
           <label className="flex flex-col gap-1.5">
             <span style={{ color: c.ink }}>How would you rate your sleep quality?</span>
             <div className="flex gap-1.5">
               {["Poor", "Fair", "OK", "Good", "Great"].map((l, i) => (
-                <span key={l} className="flex-1 text-center text-xs py-1.5 rounded-md"
-                  style={i === 1 ? { background: c.sage, color: c.surface, fontWeight: 600 } : { background: c.surface, color: c.inkFaint, border: `1px solid ${c.line}` }}>
+                <label key={l} className="flex-1 text-center text-xs py-1.5 rounded-md cursor-pointer"
+                  style={i === sleep ? { background: c.sage, color: c.surface, fontWeight: 600 } : { background: c.surface, color: c.inkFaint, border: `1px solid ${c.line}` }}>
+                  <input type="radio" name="sleep" className="sr-only" checked={i === sleep} onChange={() => setSleep(i)} />
                   {l}
-                </span>
+                </label>
               ))}
             </div>
           </label>
         </div>
-        <button className="mt-5 text-sm font-semibold px-4 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
-          Save &amp; continue
+        <button onClick={() => addToast("Progress saved")} className="mt-5 text-sm font-semibold px-4 py-2.5 rounded-full" style={{ background: c.sage, color: c.surface }}>
+          Save and continue
         </button>
       </div>
     </div>
@@ -459,17 +488,46 @@ export default function PatientJourneyMockup() {
   const [mode, setMode] = useState("clinic");
   const [clinicActive, setClinicActive] = useState(0);
   const [patientActive, setPatientActive] = useState(0);
+  const [toasts, setToasts] = useState([]);
 
   const active = mode === "clinic" ? clinicActive : patientActive;
   const setActive = mode === "clinic" ? setClinicActive : setPatientActive;
   const stages = mode === "clinic" ? clinicStages : patientStages;
   const Screen = (mode === "clinic" ? clinicScreens : patientScreens)[active];
 
+  const addToast = (msg) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, msg }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 2200);
+  };
+
   return (
     <div style={{ background: c.bg, minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.35s ease-out forwards; }
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slideIn { animation: slideIn 0.3s ease-out forwards; }
       `}</style>
+
+      {/* Toast stack */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+        {toasts.map((t) => (
+          <div key={t.id} className="animate-slideIn bg-white rounded-lg shadow-lg border px-4 py-3 text-sm font-medium flex items-center gap-2" style={{ color: c.sage, borderColor: c.sageLine }}>
+            <Check size={14} strokeWidth={3} style={{ color: c.sage }} />
+            {t.msg}
+          </div>
+        ))}
+      </div>
 
       <div className="max-w-3xl mx-auto px-5 py-10 md:py-14">
         <Eyebrow>Concept preview · illustrative, not built on any current system</Eyebrow>
@@ -481,16 +539,24 @@ export default function PatientJourneyMockup() {
           patient experiences on their own phone, from first tap to a completed intake form.
         </p>
 
-        {/* Mode toggle */}
-        <div className="flex gap-2 mb-8">
+        {/* Mode toggle with sliding pill */}
+        <div className="relative inline-flex mb-8 rounded-full p-1" style={{ background: c.surfaceSoft, border: `1px solid ${c.line}` }}>
+          <div
+            className="absolute top-1 bottom-1 rounded-full transition-all duration-300 ease-in-out"
+            style={{
+              background: c.sage,
+              width: "calc(50% - 4px)",
+              left: mode === "clinic" ? "4px" : "calc(50%)",
+            }}
+          />
           <button onClick={() => setMode("clinic")}
-            className="text-sm font-semibold px-4 py-2 rounded-full"
-            style={mode === "clinic" ? { background: c.sage, color: c.surface } : { background: c.surface, color: c.inkSoft, border: `1px solid ${c.line}` }}>
+            className="relative z-10 text-sm font-semibold px-4 py-2 rounded-full whitespace-nowrap"
+            style={{ color: mode === "clinic" ? c.surface : c.inkSoft }}>
             Clinic view
           </button>
           <button onClick={() => setMode("patient")}
-            className="text-sm font-semibold px-4 py-2 rounded-full"
-            style={mode === "patient" ? { background: c.sage, color: c.surface } : { background: c.surface, color: c.inkSoft, border: `1px solid ${c.line}` }}>
+            className="relative z-10 text-sm font-semibold px-4 py-2 rounded-full whitespace-nowrap"
+            style={{ color: mode === "patient" ? c.surface : c.inkSoft }}>
             Patient view (Karthik, new patient)
           </button>
         </div>
@@ -498,7 +564,9 @@ export default function PatientJourneyMockup() {
         <Stepper stages={stages} active={active} setActive={setActive} />
 
         <div className="rounded-3xl p-5 md:p-7 shadow-sm" style={{ background: c.surface, border: `1px solid ${c.line}` }}>
-          <Screen />
+          <div key={`${mode}-${active}`} className="animate-fadeInUp">
+            <Screen addToast={addToast} />
+          </div>
         </div>
 
         <div className="flex justify-between items-center mt-6">
